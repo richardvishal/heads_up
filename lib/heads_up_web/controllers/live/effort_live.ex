@@ -3,11 +3,14 @@ defmodule HeadsUpWeb.EffortLive do
 
   def mount(_params, _session, socket) do
     socket = assign(socket, responders: 0, minutes_per_responder: 10)
-    IO.inspect(socket)
+    # IO.inspect(socket)
+    IO.inspect(self(), label: "MOUNT")
     {:ok, socket}
   end
 
   def render(assigns) do
+    IO.inspect(self(), label: "RENDER")
+
     ~H"""
     <div class="effort">
       <h1>Community Love</h1>
@@ -33,7 +36,9 @@ defmodule HeadsUpWeb.EffortLive do
 
   def handle_event("add", %{"responders" => responders} = _unsigned_params, socket) do
     socket = update(socket, :responders, &(&1 + String.to_integer(responders)))
-    IO.inspect(socket)
+    # IO.inspect(socket)
+    IO.inspect(self(), label: "EVENT")
+    # raise "💥"
     {:noreply, socket}
   end
 end
