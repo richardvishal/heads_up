@@ -89,7 +89,7 @@ defmodule HeadsUpWeb do
       import Phoenix.HTML
       # Core UI components
       import HeadsUpWeb.CoreComponents
-
+      import HeadsUpWeb.CustomComponents
       # Shortcut for generating JS commands
       alias Phoenix.LiveView.JS
 
