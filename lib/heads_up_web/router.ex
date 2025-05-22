@@ -25,7 +25,8 @@ defmodule HeadsUpWeb.Router do
   scope "/", HeadsUpWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
+    # get "/", PageController, :home
+    live "/", Incidents.Index
     get "/tips", TipController, :index
     get "/tips/:id", TipController, :show
     live "/effort", EffortLive

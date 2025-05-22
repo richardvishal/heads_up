@@ -2,7 +2,7 @@ defmodule HeadsUpWeb.EffortLive do
   use HeadsUpWeb, :live_view
 
   def mount(_params, _session, socket) do
-    socket = assign(socket, responders: 0, minutes_per_responder: 10)
+    socket = assign(socket, responders: 0, minutes_per_responder: 10, page_title: "Effort")
     # IO.inspect(socket)
     Process.send_after(self(), :update_responders, 2000)
     IO.inspect(self(), label: "MOUNT")
