@@ -33,4 +33,12 @@ defmodule HeadsUp.Incidents do
       }
     ]
   end
+
+  def get_incident!(id) when is_integer(id), do: Enum.find(list_incidents(), &(&1.id == id))
+
+  def get_incident!(id) when is_binary(id), do: id |> String.to_integer() |> get_incident!
+
+  def urgent_incidents(incident) do
+   list_incidents() |> List.delete(incident)
+  end
 end

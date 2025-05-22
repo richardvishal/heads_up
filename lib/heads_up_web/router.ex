@@ -31,6 +31,8 @@ defmodule HeadsUpWeb.Router do
     get "/tips/:id", TipController, :show
     live "/effort", EffortLive
     live "/incidents", Incidents.Index
+    live "/incidents/:id", Incidents.Show
+
   end
 
   # Other scopes may use custom stacks.
