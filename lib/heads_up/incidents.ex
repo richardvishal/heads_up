@@ -1,9 +1,5 @@
-defmodule HeadsUp.Incident do
-  defstruct [:id, :name, :description, :priority, :image_path, :status]
-end
-
 defmodule HeadsUp.Incidents do
-  alias HeadsUp.Incident
+  alias HeadsUp.Incidents.Incident
 
   def list_incidents do
     [
@@ -15,7 +11,7 @@ defmodule HeadsUp.Incidents do
         status: :pending,
         image_path: "/images/lost-dog.jpg"
       },
-      %HeadsUp.Incident{
+      %Incident{
         id: 2,
         name: "Flat Tire",
         description: "Our beloved ice cream truck has a flat tire! 🛞",
@@ -23,7 +19,7 @@ defmodule HeadsUp.Incidents do
         status: :resolved,
         image_path: "/images/flat-tire.jpg"
       },
-      %HeadsUp.Incident{
+      %Incident{
         id: 3,
         name: "Bear In The Trash",
         description: "A curious bear is digging through the trash! 🐻",
@@ -39,6 +35,6 @@ defmodule HeadsUp.Incidents do
   def get_incident!(id) when is_binary(id), do: id |> String.to_integer() |> get_incident!
 
   def urgent_incidents(incident) do
-   list_incidents() |> List.delete(incident)
+    list_incidents() |> List.delete(incident)
   end
 end
