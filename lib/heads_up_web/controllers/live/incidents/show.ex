@@ -13,9 +13,12 @@ defmodule HeadsUpWeb.Incidents.Show do
       socket
       |> assign(
         incident: incident,
-        page_title: incident.name,
-        urgent_incidents: Incidents.urgent_incidents(incident)
+        page_title: incident.name
       )
+      |> assign_async(:urgent_incidents, fn ->
+        {:ok, %{urgent_incidents: Incidents.urgent_incidents(incident)}}
+        # {:error, "error"}
+      end)
 
     {:noreply, socket}
   end
@@ -56,14 +59,26 @@ defmodule HeadsUpWeb.Incidents.Show do
       <h4>
         Urgent Incidents
       </h4>
-      <ul class="incidents">
-        <li :for={incident <- @incidents}>
-          <.link navigate={~p"/incidents/#{incident}"}>
-            <img src={incident.image_path} />
-            {incident.name}
-          </.link>
-        </li>
-      </ul>
+      <.async_result :let={result} assign={@incidents}>
+        <:loading>
+          <div class="loading">
+            <div class="spinner"></div>
+          </div>
+        </:loading>
+        <:failed :let={{:error, reason}}>
+          <div class="failed">
+            Uhh oh! {reason}
+          </div>
+        </:failed>
+        <ul class="incidents">
+          <li :for={incident <- result}>
+            <.link navigate={~p"/incidents/#{incident}"}>
+              <img src={incident.image_path} />
+              {incident.name}
+            </.link>
+          </li>
+        </ul>
+      </.async_result>
     </section>
     """
   end
