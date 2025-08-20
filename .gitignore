@@ -35,3 +35,4 @@ heads_up-*.tar
 npm-debug.log
 /assets/node_modules/
 
+.DS_Store
