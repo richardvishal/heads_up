@@ -92,7 +92,7 @@ defmodule HeadsUpWeb.Incidents.Index do
         ]}
         prompt="Sort By"
       />
-      <.link navigate={~p"/incidents"}>
+      <.link patch={~p"/incidents"}>
         Reset
       </.link>
     </.form>
@@ -101,7 +101,7 @@ defmodule HeadsUpWeb.Incidents.Index do
 
   def handle_event("filter", params, socket) do
     params = Map.take(params, ["q", "status", "sort_by"]) |> Map.reject(fn {_, v} -> v == "" end)
-    socket = push_navigate(socket, to: ~p"/incidents?#{params}")
+    socket = push_patch(socket, to: ~p"/incidents?#{params}")
 
     {:noreply, socket}
   end
