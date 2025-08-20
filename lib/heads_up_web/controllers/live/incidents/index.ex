@@ -4,17 +4,17 @@ defmodule HeadsUpWeb.Incidents.Index do
 
   def mount(_params, _session, socket) do
     socket = stream(socket, :incidents, Incidents.list_incidents())
-    IO.inspect(socket.assigns.streams, label: "MOUNT")
+    # IO.inspect(socket.assigns.streams, label: "MOUNT")
     socket = assign(socket, :page_title, "Incidents")
 
-    socket =
-      attach_hook(socket, :log_stream, :after_render, fn
-        socket ->
-          # inspect the stream
-          IO.inspect(socket.assigns.streams, label: "AFTER MOUNT")
+    # socket =
+    #   attach_hook(socket, :log_stream, :after_render, fn
+    #     socket ->
+    #       # inspect the stream
+    #       IO.inspect(socket.assigns.streams, label: "AFTER MOUNT")
 
-          socket
-      end)
+    #       socket
+    #   end)
 
     {:ok, socket}
   end
