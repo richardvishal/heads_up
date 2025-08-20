@@ -3,9 +3,8 @@ defmodule HeadsUpWeb.Incidents.Index do
   alias HeadsUp.Incidents
 
   def mount(_params, _session, socket) do
-    socket = stream(socket, :incidents, Incidents.list_incidents())
     # IO.inspect(socket.assigns.streams, label: "MOUNT")
-    socket = assign(socket, :page_title, "Incidents") |> assign(:form, to_form(%{}))
+    socket = assign(socket, :page_title, "Incidents")
 
     # socket =
     #   attach_hook(socket, :log_stream, :after_render, fn
@@ -17,6 +16,14 @@ defmodule HeadsUpWeb.Incidents.Index do
     #   end)
 
     {:ok, socket}
+  end
+
+  def handle_params(params, _uri, socket) do
+    socket =
+      assign(socket, :form, to_form(params))
+      |> stream(:incidents, Incidents.filter_incidents(params), reset: true)
+
+    {:noreply, socket}
   end
 
   def render(assigns) do
@@ -85,14 +92,16 @@ defmodule HeadsUpWeb.Incidents.Index do
         ]}
         prompt="Sort By"
       />
+      <.link navigate={~p"/incidents"}>
+        Reset
+      </.link>
     </.form>
     """
   end
 
   def handle_event("filter", params, socket) do
-    socket =
-      assign(socket, :form, to_form(params))
-      |> stream(:incidents, Incidents.filter_incidents(params), reset: true)
+    params = Map.take(params, ["q", "status", "sort_by"]) |> Map.reject(fn {_, v} -> v == "" end)
+    socket = push_navigate(socket, to: ~p"/incidents?#{params}")
 
     {:noreply, socket}
   end
