@@ -7,6 +7,14 @@ defmodule HeadsUp.Incidents do
     Repo.all(Incident)
   end
 
+  def filter_incidents() do
+    Incident
+    |> where(status: :resolved)
+    |> where([i], ilike(i.name, "%in%"))
+    |> order_by(desc: :name)
+    |> Repo.all()
+  end
+
   def get_incident!(id), do: Repo.get!(Incident, id)
 
   def urgent_incidents(incident) do
