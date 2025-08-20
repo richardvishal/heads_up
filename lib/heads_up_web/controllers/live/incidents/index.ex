@@ -64,7 +64,7 @@ defmodule HeadsUpWeb.Incidents.Index do
 
   def filter_form(assigns) do
     ~H"""
-    <.form for={@form} id="filter-form" phx-change="filter">
+    <.form for={@form} id="filter-form" phx-change="filter" phx-submit="filter">
       <.input field={@form[:q]} placeholder="Search...." autocomplete="off" />
       <.input
         type="select"
