@@ -4,13 +4,28 @@ defmodule HeadsUpWeb.AdminIncidents.Form do
   alias HeadsUp.Admin
   alias HeadsUp.Incidents.Incident
 
-  def mount(_params, _session, socket) do
-    changeset = Admin.change_incident(%Incident{})
+  def mount(params, _session, socket) do
+    {:ok, apply_action(socket.assigns.live_action, params, socket)}
+  end
 
-    socket =
-      assign(socket, :page_title, "New Incident") |> assign(:form, to_form(changeset))
+  defp apply_action(:new, _params, socket) do
+    incident = %Incident{}
+    changeset = Admin.change_incident(incident)
 
-    {:ok, socket}
+    socket
+    |> assign(:page_title, "New Incident")
+    |> assign(:form, to_form(changeset))
+    |> assign(:incident, incident)
+  end
+
+  defp apply_action(:edit, %{"id" => id}, socket) do
+    incident = Admin.get_incident!(id)
+    changeset = Admin.change_incident(incident)
+
+    socket
+    |> assign(:page_title, "Edit Incident")
+    |> assign(:form, to_form(changeset))
+    |> assign(:incident, incident)
   end
 
   def render(assigns) do
@@ -39,7 +54,7 @@ defmodule HeadsUpWeb.AdminIncidents.Form do
   end
 
   def handle_event("validate", %{"incident" => incident_params}, socket) do
-    changeset = Admin.change_incident(%Incident{}, incident_params)
+    changeset = Admin.change_incident(socket.assigns.incident, incident_params)
 
     socket =
       socket |> assign(:form, to_form(changeset, action: :validate))
