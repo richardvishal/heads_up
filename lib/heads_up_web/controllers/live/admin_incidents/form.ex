@@ -2,10 +2,13 @@ defmodule HeadsUpWeb.AdminIncidents.Form do
   use HeadsUpWeb, :live_view
 
   alias HeadsUp.Admin
+  alias HeadsUp.Incidents.Incident
 
   def mount(_params, _session, socket) do
+    changeset = Incident.changeset(%Incident{}, %{})
+
     socket =
-      assign(socket, :page_title, "New Incident") |> assign(:form, to_form(%{}, as: "incident"))
+      assign(socket, :page_title, "New Incident") |> assign(:form, to_form(changeset))
 
     {:ok, socket}
   end
@@ -36,9 +39,15 @@ defmodule HeadsUpWeb.AdminIncidents.Form do
   end
 
   def handle_event("save", %{"incident" => incident_params}, socket) do
-    Admin.create_incident(incident_params)
-    socket = push_navigate(socket, to: ~p"/admin/incidents")
+    case Admin.create_incident(incident_params) do
+      {:ok, _incident} ->
+        {:noreply,
+         socket
+         |> put_flash(:info, "Incident created successfully")
+         |> push_navigate(to: ~p"/admin/incidents")}
 
-    {:noreply, socket}
+      {:error, %Ecto.Changeset{} = changeset} ->
+        {:noreply, assign(socket, form: to_form(changeset))}
+    end
   end
 end

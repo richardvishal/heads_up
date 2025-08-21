@@ -17,5 +17,15 @@ defmodule HeadsUp.Incidents.Incident do
     incident
     |> cast(attrs, [:name, :description, :priority, :status, :image_path])
     |> validate_required([:name, :description, :priority, :status, :image_path])
+    |> validate_length(:description, min: 10)
+    |> validate_priority()
   end
+
+  defp validate_priority(%Ecto.Changeset{changes: %{priority: priority}} = changeset)
+       when priority > 3 or priority < 1 do
+    changeset
+    |> add_error(:priority, "Priority should be between 1 and 3")
+  end
+
+  defp validate_priority(changeset), do: changeset
 end
