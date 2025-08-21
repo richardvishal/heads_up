@@ -1,4 +1,4 @@
-defmodule HeadsUpWeb.Admin.Incidents.Index do
+defmodule HeadsUpWeb.AdminIncidents.Index do
   use HeadsUpWeb, :live_view
   alias HeadsUp.Admin
   import HeadsUpWeb.CustomComponents

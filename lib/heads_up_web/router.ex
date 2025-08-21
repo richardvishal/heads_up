@@ -33,7 +33,7 @@ defmodule HeadsUpWeb.Router do
     live "/incidents", Incidents.Index
     live "/incidents/:id", Incidents.Show
 
-    live "/admin/incidents", Admin.Incidents.Index
+    live "/admin/incidents", AdminIncidents.Index
 
   end
 
