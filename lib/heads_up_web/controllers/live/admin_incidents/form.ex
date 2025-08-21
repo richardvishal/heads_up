@@ -63,7 +63,24 @@ defmodule HeadsUpWeb.AdminIncidents.Form do
   end
 
   def handle_event("save", %{"incident" => incident_params}, socket) do
+    save_incident(socket.assigns.live_action, incident_params, socket)
+  end
+
+  def save_incident(:new, incident_params, socket) do
     case Admin.create_incident(incident_params) do
+      {:ok, _incident} ->
+        {:noreply,
+         socket
+         |> put_flash(:info, "Incident created successfully")
+         |> push_navigate(to: ~p"/admin/incidents")}
+
+      {:error, %Ecto.Changeset{} = changeset} ->
+        {:noreply, assign(socket, form: to_form(changeset))}
+    end
+  end
+
+  def save_incident(:edit, incident_params, socket) do
+    case Admin.update_incident(socket.assigns.incident, incident_params) do
       {:ok, _incident} ->
         {:noreply,
          socket
