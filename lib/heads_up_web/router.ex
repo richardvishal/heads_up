@@ -34,7 +34,7 @@ defmodule HeadsUpWeb.Router do
     live "/incidents/:id", Incidents.Show
 
     live "/admin/incidents", AdminIncidents.Index
-
+    live "/admin/incidents/new", AdminIncidents.Form
   end
 
   # Other scopes may use custom stacks.
