@@ -36,6 +36,7 @@ defmodule HeadsUp.Categories do
 
   """
   def get_category!(id), do: Repo.get!(Category, id)
+  def get_category_with_incidents!(id), do: get_category!(id) |> Repo.preload(:incidents)
 
   @doc """
   Creates a category.
@@ -100,5 +101,12 @@ defmodule HeadsUp.Categories do
   """
   def change_category(%Category{} = category, attrs \\ %{}) do
     Category.changeset(category, attrs)
+  end
+
+  def category_names_and_ids do
+    Category
+    |> order_by(:name)
+    |> select([c], {c.name, c.id})
+    |> Repo.all()
   end
 end

@@ -31,9 +31,14 @@ defmodule HeadsUpWeb.Incidents.Show do
         <section>
           <.badge status={@incident.status} />
           <header>
-            <h2>
-              {@incident.name}
-            </h2>
+            <div>
+              <h2>
+                {@incident.name}
+              </h2>
+              <h3>
+                {@incident.category.name}
+              </h3>
+            </div>
             <div class="priority">
               {@incident.priority}
             </div>

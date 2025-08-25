@@ -3,12 +3,17 @@ defmodule HeadsUpWeb.AdminIncidents.Form do
 
   alias HeadsUp.Admin
   alias HeadsUp.Incidents.Incident
+  alias HeadsUp.Categories
 
   def mount(params, _session, socket) do
-    {:ok, apply_action(socket.assigns.live_action, params, socket)}
+    socket =
+      assign(socket, :categories_options, Categories.category_names_and_ids())
+      |> apply_action(socket.assigns.live_action, params)
+
+    {:ok, socket}
   end
 
-  defp apply_action(:new, _params, socket) do
+  defp apply_action(socket, :new, _params) do
     incident = %Incident{}
     changeset = Admin.change_incident(incident)
 
@@ -18,7 +23,7 @@ defmodule HeadsUpWeb.AdminIncidents.Form do
     |> assign(:incident, incident)
   end
 
-  defp apply_action(:edit, %{"id" => id}, socket) do
+  defp apply_action(socket, :edit, %{"id" => id}) do
     incident = Admin.get_incident!(id)
     changeset = Admin.change_incident(incident)
 
@@ -42,6 +47,13 @@ defmodule HeadsUpWeb.AdminIncidents.Form do
         options={[:pending, :resolved, :canceled]}
         field={@form[:status]}
         label="Status"
+      />
+      <.input
+        prompt="Select Category"
+        type="select"
+        options={@categories_options}
+        field={@form[:category_id]}
+        label="Category"
       />
       <.input type="textarea" field={@form[:description]} label="Description" phx-debounce="blur" />
       <.input field={@form[:image_path]} label="Image Path" />

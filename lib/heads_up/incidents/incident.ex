@@ -17,10 +17,11 @@ defmodule HeadsUp.Incidents.Incident do
   @doc false
   def changeset(incident, attrs) do
     incident
-    |> cast(attrs, [:name, :description, :priority, :status, :image_path])
-    |> validate_required([:name, :description, :priority, :status, :image_path])
+    |> cast(attrs, [:name, :description, :priority, :status, :image_path, :category_id])
+    |> validate_required([:name, :description, :priority, :status, :image_path, :category_id])
     |> validate_length(:description, min: 10)
     |> validate_priority()
+    |> assoc_constraint(:category)
   end
 
   defp validate_priority(%Ecto.Changeset{changes: %{priority: priority}} = changeset)
