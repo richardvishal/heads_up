@@ -49,6 +49,7 @@ defmodule HeadsUpWeb.Router do
     pipe_through :api
     get "/incidents", IncidentsController, :index
     get "/incidents/:id", IncidentsController, :show
+    post "/incidents", IncidentsController, :create
     get "/categories/:id/incidents", CategoryController, :show
   end
 
