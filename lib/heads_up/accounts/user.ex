@@ -4,6 +4,7 @@ defmodule HeadsUp.Accounts.User do
 
   schema "users" do
     field :email, :string
+    field :username, :string
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
     field :current_password, :string, virtual: true, redact: true
@@ -37,9 +38,19 @@ defmodule HeadsUp.Accounts.User do
   """
   def registration_changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:email, :password])
+    |> cast(attrs, [:email, :password, :username])
     |> validate_email(opts)
     |> validate_password(opts)
+    |> validate_username()
+  end
+
+  defp validate_username(changeset) do
+    changeset
+    |> validate_required([:username])
+    |> validate_length(:username, min: 2, max: 20)
+    |> validate_format(:username, ~r/^[a-z0-9_]{2,20}$/i)
+    |> unsafe_validate_unique(:username, HeadsUp.Repo)
+    |> unique_constraint(:username)
   end
 
   defp validate_email(changeset, opts) do
