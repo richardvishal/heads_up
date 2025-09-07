@@ -127,6 +127,9 @@ defmodule HeadsUpWeb.UserAuth do
     * `:redirect_if_user_is_authenticated` - Authenticates the user from the session.
       Redirects to signed_in_path if there's a logged user.
 
+    * `:ensure_admin` - Ensures the current user is an admin.
+      Redirects to root page if the user is not an admin.
+
   ## Examples
 
   Use the `on_mount` lifecycle macro in LiveViews to mount or authenticate
@@ -159,6 +162,19 @@ defmodule HeadsUpWeb.UserAuth do
         socket
         |> Phoenix.LiveView.put_flash(:error, "You must log in to access this page.")
         |> Phoenix.LiveView.redirect(to: ~p"/users/log-in")
+
+      {:halt, socket}
+    end
+  end
+
+  def on_mount(:ensure_admin, _params, session, socket) do
+    if socket.assigns.current_user.is_admin do
+      {:cont, socket}
+    else
+      socket =
+        socket
+        |> Phoenix.LiveView.put_flash(:error, "Only admins allowed!")
+        |> Phoenix.LiveView.redirect(to: ~p"/")
 
       {:halt, socket}
     end
@@ -209,6 +225,22 @@ defmodule HeadsUpWeb.UserAuth do
       |> put_flash(:error, "You must log in to access this page.")
       |> maybe_store_return_to()
       |> redirect(to: ~p"/users/log-in")
+      |> halt()
+    end
+  end
+
+  @doc """
+  Used for routes that require the user to be authenticated as admin.
+  """
+
+  def require_admin(conn, _opts) do
+    if conn.assigns.current_user.is_admin do
+      conn
+    else
+      conn
+      |> put_flash(:error, "Only admins allowed!")
+      |> maybe_store_return_to()
+      |> redirect(to: ~p"/")
       |> halt()
     end
   end
