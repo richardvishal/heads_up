@@ -3,8 +3,6 @@ defmodule HeadsUpWeb.CategoryLive.Index do
 
   alias HeadsUp.Categories
 
-  on_mount {HeadsUpWeb.UserAuth, :ensure_authenticated}
-
   @impl true
   def render(assigns) do
     ~H"""
