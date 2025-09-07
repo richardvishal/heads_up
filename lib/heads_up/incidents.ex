@@ -11,9 +11,16 @@ defmodule HeadsUp.Incidents do
     Incident
     |> with_status(filter["status"])
     |> search_by(filter["q"])
+    |> with_category(filter["category"])
     |> sort_by(filter["sort_by"])
     |> preload(:category)
     |> Repo.all()
+  end
+
+  defp with_category(query, slug) when slug in ["", nil], do: query
+
+  defp with_category(query, slug) do
+    from(i in query, join: c in assoc(i, :category), where: c.slug == ^slug)
   end
 
   defp with_status(query, status) when status in ~w(pending resolved canceled) do
@@ -31,6 +38,12 @@ defmodule HeadsUp.Incidents do
   defp sort_by(query, "name"), do: order_by(query, desc: :name)
   defp sort_by(query, "priority_desc"), do: order_by(query, desc: :priority)
   defp sort_by(query, "priority_asc"), do: order_by(query, asc: :priority)
+
+  defp sort_by(query, "category") do
+    query
+    |> join(:inner, [i], c in assoc(i, :category))
+    |> order_by([_i, c], asc: c.name)
+  end
 
   defp sort_by(query, _), do: query
 

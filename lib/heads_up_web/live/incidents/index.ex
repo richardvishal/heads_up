@@ -1,10 +1,12 @@
 defmodule HeadsUpWeb.Incidents.Index do
   use HeadsUpWeb, :live_view
   alias HeadsUp.Incidents
+  alias HeadsUp.Categories
 
   def mount(_params, _session, socket) do
     # IO.inspect(socket.assigns.streams, label: "MOUNT")
-    socket = assign(socket, :page_title, "Incidents")
+    socket =
+      assign(socket, page_title: "Incidents", category: Categories.category_names_and_slugs())
 
     # socket =
     #   attach_hook(socket, :log_stream, :after_render, fn
@@ -36,7 +38,7 @@ defmodule HeadsUpWeb.Incidents.Index do
         </:tagline>
       </.headline>
 
-      <.filter_form form={@form} />
+      <.filter_form form={@form} category={@category} />
 
       <div class="incidents" id="incidents" phx-update="stream">
         <div id="empty" class="no-results only:block hidden">
@@ -59,9 +61,9 @@ defmodule HeadsUpWeb.Incidents.Index do
     ~H"""
     <.link navigate={~p"/incidents/#{@incident}"} id={@id}>
       <div class="card">
-      <div class="category">
-      {@incident.category.name}
-      </div>
+        <div class="category">
+          {@incident.category.name}
+        </div>
         <img src={@incident.image_path} />
         <h2>{@incident.name}</h2>
         <div class="details">
@@ -87,11 +89,18 @@ defmodule HeadsUpWeb.Incidents.Index do
       />
       <.input
         type="select"
+        field={@form[:category]}
+        options={@category}
+        prompt="Category"
+      />
+      <.input
+        type="select"
         field={@form[:sort_by]}
         options={[
           Name: "name",
           "Priority High to Low": "priority_desc",
-          "Priority Low to High": "priority_asc"
+          "Priority Low to High": "priority_asc",
+          Category: "category"
         ]}
         prompt="Sort By"
       />
@@ -103,7 +112,9 @@ defmodule HeadsUpWeb.Incidents.Index do
   end
 
   def handle_event("filter", params, socket) do
-    params = Map.take(params, ["q", "status", "sort_by"]) |> Map.reject(fn {_, v} -> v == "" end)
+    params =
+      Map.take(params, ~w(q status sort_by category)) |> Map.reject(fn {_, v} -> v == "" end)
+
     socket = push_patch(socket, to: ~p"/incidents?#{params}")
 
     {:noreply, socket}
