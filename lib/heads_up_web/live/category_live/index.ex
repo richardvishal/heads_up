@@ -3,40 +3,42 @@ defmodule HeadsUpWeb.CategoryLive.Index do
 
   alias HeadsUp.Categories
 
+  on_mount {HeadsUpWeb.UserAuth, :ensure_authenticated}
+
   @impl true
   def render(assigns) do
     ~H"""
-      <.header>
-        Listing Categories
-        <:actions>
-          <.link class="button" navigate={~p"/categories/new"}>
-            <.icon name="hero-plus" /> New Category
-          </.link>
-        </:actions>
-      </.header>
+    <.header>
+      Listing Categories
+      <:actions>
+        <.link class="button" navigate={~p"/categories/new"}>
+          <.icon name="hero-plus" /> New Category
+        </.link>
+      </:actions>
+    </.header>
 
-      <.table
-        id="categories"
-        rows={@streams.categories}
-        row_click={fn {_id, category} -> JS.navigate(~p"/categories/#{category}") end}
-      >
-        <:col :let={{_id, category}} label="Name">{category.name}</:col>
-        <:col :let={{_id, category}} label="Slug">{category.slug}</:col>
-        <:action :let={{_id, category}}>
-          <div class="sr-only">
-            <.link navigate={~p"/categories/#{category}"}>Show</.link>
-          </div>
-          <.link navigate={~p"/categories/#{category}/edit"}>Edit</.link>
-        </:action>
-        <:action :let={{id, category}}>
-          <.link
-            phx-click={JS.push("delete", value: %{id: category.id}) |> hide("##{id}")}
-            data-confirm="Are you sure?"
-          >
-            Delete
-          </.link>
-        </:action>
-      </.table>
+    <.table
+      id="categories"
+      rows={@streams.categories}
+      row_click={fn {_id, category} -> JS.navigate(~p"/categories/#{category}") end}
+    >
+      <:col :let={{_id, category}} label="Name">{category.name}</:col>
+      <:col :let={{_id, category}} label="Slug">{category.slug}</:col>
+      <:action :let={{_id, category}}>
+        <div class="sr-only">
+          <.link navigate={~p"/categories/#{category}"}>Show</.link>
+        </div>
+        <.link navigate={~p"/categories/#{category}/edit"}>Edit</.link>
+      </:action>
+      <:action :let={{id, category}}>
+        <.link
+          phx-click={JS.push("delete", value: %{id: category.id}) |> hide("##{id}")}
+          data-confirm="Are you sure?"
+        >
+          Delete
+        </.link>
+      </:action>
+    </.table>
     """
   end
 

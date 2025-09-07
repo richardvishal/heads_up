@@ -2,6 +2,7 @@ defmodule HeadsUpWeb.AdminIncidents.Index do
   use HeadsUpWeb, :live_view
   alias HeadsUp.Admin
   import HeadsUpWeb.CustomComponents
+  on_mount {HeadsUpWeb.UserAuth, :ensure_authenticated}
 
   def mount(_params, _session, socket) do
     socket =
@@ -18,7 +19,7 @@ defmodule HeadsUpWeb.AdminIncidents.Index do
         Toggle Joke
       </.button>
       <div id="joke" class="joke hidden" phx-click={toggle_blur()}>
-        Why shouldn't you trust trees?
+        Why shouldn't you trust trees, {@current_user.username}?
       </div>
       <.header>
         {@page_title}
