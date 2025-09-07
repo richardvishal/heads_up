@@ -6,7 +6,7 @@ defmodule HeadsUpWeb.Incidents.Index do
   def mount(_params, _session, socket) do
     # IO.inspect(socket.assigns.streams, label: "MOUNT")
     socket =
-      assign(socket, page_title: "Incidents", category: Categories.category_names_and_slugs())
+      assign(socket, category: Categories.category_names_and_slugs())
 
     # socket =
     #   attach_hook(socket, :log_stream, :after_render, fn
