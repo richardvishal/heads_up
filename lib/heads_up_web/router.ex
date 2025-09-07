@@ -45,9 +45,11 @@ defmodule HeadsUpWeb.Router do
   end
 
   # Other scopes may use custom stacks.
-  # scope "/api", HeadsUpWeb do
-  #   pipe_through :api
-  # end
+  scope "/api", HeadsUpWeb.Api do
+    pipe_through :api
+    get "/incidents", IncidentsController, :index
+    get "/incidents/:id", IncidentsController, :show
+  end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:heads_up, :dev_routes) do
