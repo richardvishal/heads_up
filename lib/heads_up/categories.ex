@@ -109,6 +109,7 @@ defmodule HeadsUp.Categories do
     |> select([c], {c.name, c.id})
     |> Repo.all()
   end
+
   def category_names_and_slugs do
     Category
     |> order_by(:name)
