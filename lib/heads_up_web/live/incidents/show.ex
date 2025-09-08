@@ -12,6 +12,7 @@ defmodule HeadsUpWeb.Incidents.Show do
 
   def handle_params(%{"id" => id}, _uri, socket) do
     incident = Incidents.get_incident!(id)
+    responses = Incidents.list_responses(incident)
 
     socket =
       socket
@@ -19,6 +20,8 @@ defmodule HeadsUpWeb.Incidents.Show do
         incident: incident,
         page_title: incident.name
       )
+      |> stream(:responses, responses)
+      |> assign(:responses_count, length(responses))
       |> assign_async(:urgent_incidents, fn ->
         {:ok, %{urgent_incidents: Incidents.urgent_incidents(incident)}}
         # {:error, "error"}
@@ -47,6 +50,9 @@ defmodule HeadsUpWeb.Incidents.Show do
               {@incident.priority}
             </div>
           </header>
+          <div class="totals">
+            {@responses_count} Responses
+          </div>
           <div class="description">
             {@incident.description}
           </div>
@@ -63,6 +69,13 @@ defmodule HeadsUpWeb.Incidents.Show do
               </.link>
             <% end %>
           </div>
+          <div id="responses" phx-update="stream">
+            <.response
+              :for={{dom_id, response} <- @streams.responses}
+              id={dom_id}
+              response={response}
+            />
+          </div>
         </div>
         <div class="right">
           <.urgent_incidents incidents={@urgent_incidents} />
@@ -72,6 +85,32 @@ defmodule HeadsUpWeb.Incidents.Show do
     """
   end
 
+  attr :id, :string, required: true
+  attr :response, Response, required: true
+
+  defp response(assigns) do
+    ~H"""
+    <div class="response" id={@id}>
+      <span class="timeline"></span>
+      <section>
+        <div class="avatar">
+          <.icon name="hero-user-solid" />
+        </div>
+        <div>
+          <span class="username">
+            {@response.user.username}
+          </span>
+          <span>
+            {@response.status}
+          </span>
+          <blockquote>
+            {@response.note}
+          </blockquote>
+        </div>
+      </section>
+    </div>
+    """
+  end
 
   defp response_form(assigns) do
     ~H"""
@@ -133,8 +172,13 @@ defmodule HeadsUpWeb.Incidents.Show do
     %{incident: incident, current_user: user} = socket.assigns
 
     case Responses.create_response(incident, user, response_params) do
-      {:ok, _response} ->
-        socket = assign(socket, form: to_form(Responses.change_response(%Response{})))
+      {:ok, response} ->
+        socket =
+          socket
+          |> assign(form: to_form(Responses.change_response(%Response{})))
+          |> stream_insert(:responses, response, at: 0)
+          |> update(:responses_count, &(&1 + 1))
+
         {:noreply, socket}
 
       {:error, %Ecto.Changeset{} = changeset} ->
