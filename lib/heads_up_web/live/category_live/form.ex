@@ -7,19 +7,19 @@ defmodule HeadsUpWeb.CategoryLive.Form do
   @impl true
   def render(assigns) do
     ~H"""
-      <.header>
-        {@page_title}
-        <:subtitle>Use this form to manage category records in your database.</:subtitle>
-      </.header>
+    <.header>
+      {@page_title}
+      <:subtitle>Use this form to manage category records in your database.</:subtitle>
+    </.header>
 
-      <.simple_form for={@form} id="category-form" phx-change="validate" phx-submit="save">
-        <.input field={@form[:name]} type="text" label="Name" />
-        <.input field={@form[:slug]} type="text" label="Slug" />
-        <footer>
-          <.button phx-disable-with="Saving...">Save Category</.button>
-          <.link class="button" navigate={return_path(@return_to, @category)}>Cancel</.link>
-        </footer>
-      </.simple_form>
+    <.simple_form for={@form} id="category-form" phx-change="validate" phx-submit="save">
+      <.input field={@form[:name]} type="text" label="Name" />
+      <.input field={@form[:slug]} type="text" label="Slug" />
+      <footer>
+        <.button phx-disable-with="Saving...">Save Category</.button>
+        <.link class="button" navigate={return_path(@return_to, @category)}>Cancel</.link>
+      </footer>
+    </.simple_form>
     """
   end
 

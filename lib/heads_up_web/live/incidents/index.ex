@@ -87,12 +87,7 @@ defmodule HeadsUpWeb.Incidents.Index do
         options={[:pending, :resolved, :canceled]}
         prompt="Status"
       />
-      <.input
-        type="select"
-        field={@form[:category]}
-        options={@category}
-        prompt="Category"
-      />
+      <.input type="select" field={@form[:category]} options={@category} prompt="Category" />
       <.input
         type="select"
         field={@form[:sort_by]}

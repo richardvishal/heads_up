@@ -15,6 +15,7 @@ defmodule HeadsUpWeb.CustomComponents do
     </div>
     """
   end
+
   slot :inner_block, required: true
   slot :tagline
 
