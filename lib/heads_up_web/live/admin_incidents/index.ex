@@ -39,6 +39,9 @@ defmodule HeadsUpWeb.AdminIncidents.Index do
         <:col :let={{_dom_id, incident}} label="Status">
           <.badge status={incident.status} />
         </:col>
+        <:col :let={{_dom_id, incident}} label="Heroic Response#">
+          {incident.heroic_response_id}
+        </:col>
         <:action :let={{_dom_id, incident}}>
           <.link navigate={~p"/admin/incidents/#{incident}/edit"}>Edit</.link>
         </:action>
@@ -46,6 +49,11 @@ defmodule HeadsUpWeb.AdminIncidents.Index do
         <:action :let={{dom_id, incident}}>
           <.link phx-click={delete_and_fade_out(dom_id, incident)} data-confirm="Are you sure?">
             <.icon name="hero-trash" class="h-4 w-4" /> Delete
+          </.link>
+        </:action>
+        <:action :let={{_dom_id, incident}}>
+          <.link phx-click="draw-response" phx-value-id={incident.id}>
+            Draw Response
           </.link>
         </:action>
       </.table>
@@ -58,6 +66,23 @@ defmodule HeadsUpWeb.AdminIncidents.Index do
     {:ok, _} = Admin.delete_incident(incident)
 
     {:noreply, stream_delete(socket, :incidents, incident)}
+  end
+
+  def handle_event("draw-response", %{"id" => id}, socket) do
+    incident = Admin.get_incident!(id)
+
+    case Admin.draw_heroic_response(incident) do
+      {:error, error} ->
+        {:noreply, put_flash(socket, :error, error)}
+
+      {:ok, incident} ->
+        socket =
+          socket
+          |> put_flash(:info, "Heroic response drawn!")
+          |> stream_insert(:incidents, incident)
+
+        {:noreply, socket}
+    end
   end
 
   defp toggle_blur() do

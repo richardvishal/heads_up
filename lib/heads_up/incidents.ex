@@ -55,7 +55,8 @@ defmodule HeadsUp.Incidents do
 
   defp sort_by(query, _), do: query
 
-  def get_incident!(id), do: Repo.get!(Incident, id) |> Repo.preload(:category)
+  def get_incident!(id),
+    do: Repo.get!(Incident, id) |> Repo.preload([:category, heroic_response: :user])
 
   def urgent_incidents(incident) do
     Incident
