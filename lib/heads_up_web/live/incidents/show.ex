@@ -176,7 +176,7 @@ defmodule HeadsUpWeb.Incidents.Show do
     %{incident: incident, current_user: user} = socket.assigns
 
     case Responses.create_response(incident, user, response_params) do
-      {:ok, response} ->
+      {:ok, _response} ->
         socket =
           socket
           |> assign(form: to_form(Responses.change_response(%Response{})))
