@@ -19,7 +19,9 @@ defmodule HeadsUp.Responses do
 
   """
   def list_responses do
-    Repo.all(Response)
+    Response
+    |> preload([:incident, :user])
+    |> Repo.all()
   end
 
   @doc """
@@ -36,17 +38,17 @@ defmodule HeadsUp.Responses do
       ** (Ecto.NoResultsError)
 
   """
-  def get_response!(id), do: Repo.get!(Response, id)
+  def get_response!(id), do: Repo.get!(Response, id) |> Repo.preload([:incident, :user])
 
   @doc """
   Creates a response.
 
   ## Examples
 
-      iex> create_response(%{field: value})
+      iex> create_response(incident, user, %{field: value})
       {:ok, %Response{}}
 
-      iex> create_response(%{field: bad_value})
+      iex> create_response(incident, user, %{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """

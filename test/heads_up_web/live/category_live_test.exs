@@ -4,6 +4,12 @@ defmodule HeadsUpWeb.CategoryLiveTest do
   import Phoenix.LiveViewTest
   import HeadsUp.CategoriesFixtures
 
+  setup %{conn: conn} do
+    user = HeadsUp.AccountsFixtures.user_fixture()
+    {:ok, user} = HeadsUp.Accounts.update_user(user, %{is_admin: true})
+    %{conn: log_in_user(conn, user)}
+  end
+
   @create_attrs %{name: "some name", slug: "some slug"}
   @update_attrs %{name: "some updated name", slug: "some updated slug"}
   @invalid_attrs %{name: nil, slug: nil}

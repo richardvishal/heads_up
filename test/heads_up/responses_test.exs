@@ -7,6 +7,8 @@ defmodule HeadsUp.ResponsesTest do
     alias HeadsUp.Responses.Response
 
     import HeadsUp.ResponsesFixtures
+    import HeadsUp.IncidentsFixtures
+    import HeadsUp.AccountsFixtures
 
     @invalid_attrs %{status: nil, note: nil}
 
@@ -20,31 +22,46 @@ defmodule HeadsUp.ResponsesTest do
       assert Responses.get_response!(response.id) == response
     end
 
-    test "create_response/1 with valid data creates a response" do
+    test "create_response/3 with valid data creates a response" do
+      incident = incident_fixture()
+      user = user_fixture()
       valid_attrs = %{status: :enroute, note: "some note"}
 
-      assert {:ok, %Response{} = response} = Responses.create_response(valid_attrs)
+      assert {:ok, %Response{} = response} =
+               Responses.create_response(incident, user, valid_attrs)
+
       assert response.status == :enroute
       assert response.note == "some note"
     end
 
-    test "create_response/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Responses.create_response(@invalid_attrs)
+    test "create_response/3 with invalid data returns error changeset" do
+      incident = incident_fixture()
+      user = user_fixture()
+
+      assert {:error, %Ecto.Changeset{}} =
+               Responses.create_response(incident, user, @invalid_attrs)
     end
 
     test "update_response/2 with valid data updates the response" do
       response = response_fixture()
       update_attrs = %{status: :arrived, note: "some updated note"}
 
-      assert {:ok, %Response{} = response} = Responses.update_response(response, update_attrs)
+      assert {:ok, %Response{} = response} =
+               Responses.update_response(response, update_attrs)
+
       assert response.status == :arrived
       assert response.note == "some updated note"
     end
 
     test "update_response/2 with invalid data returns error changeset" do
       response = response_fixture()
-      assert {:error, %Ecto.Changeset{}} = Responses.update_response(response, @invalid_attrs)
-      assert response == Responses.get_response!(response.id)
+
+      assert {:error, %Ecto.Changeset{}} =
+               Responses.update_response(response, @invalid_attrs)
+
+      reloaded = Responses.get_response!(response.id) |> Repo.preload([:incident, :user])
+
+      assert response == reloaded
     end
 
     test "delete_response/1 deletes the response" do

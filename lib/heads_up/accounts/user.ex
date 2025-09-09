@@ -16,6 +16,14 @@ defmodule HeadsUp.Accounts.User do
     timestamps(type: :utc_datetime)
   end
 
+  def changeset(user, attrs) do
+    user
+    |> cast(attrs, [:username, :email, :is_admin])
+    |> validate_required([:username, :email])
+    |> unique_constraint(:email)
+    |> unique_constraint(:username)
+  end
+
   @doc """
   A user changeset for registration.
 

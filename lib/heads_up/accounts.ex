@@ -350,4 +350,27 @@ defmodule HeadsUp.Accounts do
       {:error, :user, changeset, _} -> {:error, changeset}
     end
   end
+
+  @doc """
+  Updates a user with the given attributes.
+
+  This can be used to update fields like `:username`, `:email`, or `:is_admin`.
+
+  ## Examples
+
+      iex> update_user(user, %{username: "new_username"})
+      {:ok, %User{}}
+
+      iex> update_user(user, %{email: "invalid_email"})
+      {:error, %Ecto.Changeset{}}
+
+      iex> update_user(user, %{is_admin: true})
+      {:ok, %User{}}
+
+  """
+  def update_user(%User{} = user, attrs) do
+    user
+    |> User.changeset(attrs)
+    |> Repo.update()
+  end
 end
