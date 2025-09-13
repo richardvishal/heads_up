@@ -1,4 +1,5 @@
 defmodule HeadsUpWeb.Incidents.Show do
+  alias HeadsUpWeb.Presence
   use HeadsUpWeb, :live_view
   alias HeadsUp.Incidents
   alias HeadsUp.Responses
@@ -11,9 +12,27 @@ defmodule HeadsUpWeb.Incidents.Show do
   end
 
   def handle_params(%{"id" => id}, _uri, socket) do
+    %{current_user: current_user} = socket.assigns
+
     if connected?(socket) do
       Incidents.subscribe(id)
+
+      if current_user do
+        {:ok, _} =
+          Presence.track(self(), topic(id), current_user.username, %{
+            online_at: System.system_time(:second)
+          })
+      end
     end
+
+    presences =
+      Presence.list(topic(id))
+      |> Enum.map(fn {username, %{metas: metas}} ->
+        %{
+          id: username,
+          metas: metas
+        }
+      end)
 
     incident = Incidents.get_incident!(id)
     responses = Incidents.list_responses(incident)
@@ -25,6 +44,7 @@ defmodule HeadsUpWeb.Incidents.Show do
         page_title: incident.name
       )
       |> stream(:responses, responses)
+      |> stream(:presences, presences)
       |> assign(:responses_count, length(responses))
       |> assign_async(:urgent_incidents, fn ->
         {:ok, %{urgent_incidents: Incidents.urgent_incidents(incident)}}
@@ -34,12 +54,14 @@ defmodule HeadsUpWeb.Incidents.Show do
     {:noreply, socket}
   end
 
+  defp topic(incident_id), do: "incident_onlookers:#{incident_id}"
+
   def render(assigns) do
     ~H"""
     <div class="incident-show">
       <.headline :if={@incident.heroic_response}>
-        <.icon name="hero-sparkles-solid" /> Heroic Responder:
-        {@incident.heroic_response.user.username}
+        <.icon name="hero-sparkles-solid" />
+        Heroic Responder: {@incident.heroic_response.user.username}
         <:tagline>
           {@incident.heroic_response.note}
         </:tagline>
@@ -90,6 +112,7 @@ defmodule HeadsUpWeb.Incidents.Show do
         </div>
         <div class="right">
           <.urgent_incidents incidents={@urgent_incidents} />
+          <.onlookers presences={@streams.presences} />
         </div>
       </div>
     </div>
@@ -164,6 +187,19 @@ defmodule HeadsUpWeb.Incidents.Show do
           </li>
         </ul>
       </.async_result>
+    </section>
+    """
+  end
+
+  def onlookers(assigns) do
+    ~H"""
+    <section>
+      <h4>Onlookers</h4>
+      <ul class="presences" id="onlookers" phx-update="stream">
+        <li :for={{dom_id, %{id: username, metas: metas}} <- @presences} id={dom_id}>
+          <.icon name="hero-user-circle-solid" class="w-5 h-5" /> {username} ({length(metas)})
+        </li>
+      </ul>
     </section>
     """
   end
