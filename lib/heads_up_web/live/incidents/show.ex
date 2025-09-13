@@ -18,21 +18,12 @@ defmodule HeadsUpWeb.Incidents.Show do
       Incidents.subscribe(id)
 
       if current_user do
-        {:ok, _} =
-          Presence.track(self(), topic(id), current_user.username, %{
-            online_at: System.system_time(:second)
-          })
+        Presence.track_user(id, current_user)
+        Presence.subscribe(id)
       end
     end
 
-    presences =
-      Presence.list(topic(id))
-      |> Enum.map(fn {username, %{metas: metas}} ->
-        %{
-          id: username,
-          metas: metas
-        }
-      end)
+    presences = Presence.list_presences(id)
 
     incident = Incidents.get_incident!(id)
     responses = Incidents.list_responses(incident)
@@ -53,8 +44,6 @@ defmodule HeadsUpWeb.Incidents.Show do
 
     {:noreply, socket}
   end
-
-  defp topic(incident_id), do: "incident_onlookers:#{incident_id}"
 
   def render(assigns) do
     ~H"""
@@ -242,5 +231,19 @@ defmodule HeadsUpWeb.Incidents.Show do
 
   def handle_info({:incident_updated, incident}, socket) do
     {:noreply, assign(socket, :incident, incident)}
+  end
+
+  def handle_info({:user_joined, presence}, socket) do
+    {:noreply, stream_insert(socket, :presences, presence)}
+  end
+
+  def handle_info({:user_left, presence}, socket) do
+    case presence.metas == [] do
+      false ->
+        {:noreply, stream_insert(socket, :presences, presence)}
+
+      true ->
+        {:noreply, stream_delete(socket, :presences, presence)}
+    end
   end
 end
