@@ -61,7 +61,8 @@ defmodule HeadsUp.MixProject do
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.5"},
-      {:excoveralls, "~> 0.16", only: :test}
+      {:excoveralls, "~> 0.16", only: :test},
+      {:mox, "~> 1.0", only: [:dev, :test]}
     ]
   end
 
