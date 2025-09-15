@@ -8,8 +8,8 @@ defmodule HeadsUpWeb.Presence do
     pubsub_server: HeadsUp.PubSub
 
   # Use runtime lookup to avoid compile-time resolution of test mocks.
-  defp presence_module, do: Application.get_env(:heads_up, :presence_module, Phoenix.Presence)
-  defp pubsub_module, do: Application.get_env(:heads_up, :pubsub_module, Phoenix.PubSub)
+  defp presence_module, do: Application.get_env(:heads_up, :presence_module, __MODULE__)
+  defp pubsub_module, do: Application.get_env(:heads_up, :pubsub_module, HeadsUp.PubSub)
 
   @doc """
   Track a user on the presence topic. Returns `{:ok, _}` or `{:error, reason}`.
