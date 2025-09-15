@@ -49,7 +49,9 @@ defmodule HeadsUp.Incidents.IncidentTest do
         attrs = %{
           priority: priority,
           name: "Test",
-          description: "Long enough description",
+          description: "This is a long enough description",
+          status: :pending,
+          image_path: "/images/placeholder.jpg",
           category_id: category.id
         }
 
