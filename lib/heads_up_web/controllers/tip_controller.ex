@@ -8,6 +8,12 @@ defmodule HeadsUpWeb.TipController do
   end
 
   def show(conn, %{"id" => id}) do
-    render(conn, :show, tip: Tips.get_tip!(id))
+    case Tips.get_tip!(id) do
+      nil ->
+        send_resp(conn, 404, "Not Found")
+
+      tip ->
+        render(conn, :show, tip: tip)
+    end
   end
 end

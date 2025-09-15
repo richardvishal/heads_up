@@ -124,5 +124,59 @@ defmodule HeadsUpWeb.CategoryLiveTest do
       assert html =~ "Category updated successfully"
       assert html =~ "some updated name"
     end
+
+    test "displays incidents for a category", %{conn: conn, category: category} do
+      # Insert an incident belonging to this category
+      incident = HeadsUp.IncidentsFixtures.incident_fixture(%{category_id: category.id})
+
+      {:ok, _show_live, html} = live(conn, ~p"/categories/#{category}")
+
+      assert html =~ "Incidents"
+      assert html =~ incident.name
+      assert html =~ incident.image_path
+    end
+  end
+
+  describe "Index additional coverage" do
+    setup [:create_category]
+
+    test "handles invalid create submission", %{conn: conn} do
+      {:ok, index_live, _html} = live(conn, ~p"/categories/new")
+
+      invalid_attrs = %{name: nil, slug: nil}
+
+      assert index_live
+             |> form("#category-form", category: invalid_attrs)
+             |> render_submit() =~ "can&#39;t be blank"
+    end
+
+    test "handles invalid edit submission", %{conn: conn, category: category} do
+      {:ok, index_live, _html} = live(conn, ~p"/categories/#{category}/edit")
+
+      invalid_attrs = %{name: nil, slug: nil}
+
+      assert index_live
+             |> form("#category-form", category: invalid_attrs)
+             |> render_submit() =~ "can&#39;t be blank"
+    end
+
+    test "return_path with show branch", %{conn: conn, category: category} do
+      {:ok, show_live, _html} = live(conn, ~p"/categories/#{category}")
+
+      assert {:ok, form_live, _html} =
+               show_live
+               |> element("a", "Edit")
+               |> render_click()
+               |> follow_redirect(conn, ~p"/categories/#{category}/edit?return_to=show")
+
+      assert render(form_live) =~ "Edit Category"
+    end
+
+    test "handles unknown live_action safely", %{conn: conn} do
+      {:ok, _live_view, html} = live(conn, ~p"/categories/new?unknown_param=true")
+
+      # Ensure it rendered without crashing
+      assert html =~ "New Category"
+    end
   end
 end

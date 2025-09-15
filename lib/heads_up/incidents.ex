@@ -1,6 +1,9 @@
 defmodule HeadsUp.Incidents do
   alias HeadsUp.Incidents.Incident
   alias HeadsUp.Repo
+
+  @behaviour HeadsUp.IncidentsBehaviour
+
   import Ecto.Query
 
   def subscribe(incident_id) do
@@ -58,13 +61,13 @@ defmodule HeadsUp.Incidents do
   def get_incident!(id),
     do: Repo.get!(Incident, id) |> Repo.preload([:category, heroic_response: :user])
 
+  @impl HeadsUp.IncidentsBehaviour
   def urgent_incidents(incident) do
-    Incident
-    |> where(status: :pending)
-    |> where([i], i.id != ^incident.id)
-    |> order_by(asc: :priority)
-    |> limit(3)
-    |> Repo.all()
+    incidents =
+      from(i in Incident, where: i.id != ^incident.id and i.priority == 3)
+      |> Repo.all()
+
+    {:ok, %{urgent_incidents: incidents}}
   end
 
   def list_responses(incident) do

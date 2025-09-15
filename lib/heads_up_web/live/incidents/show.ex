@@ -38,8 +38,7 @@ defmodule HeadsUpWeb.Incidents.Show do
       |> stream(:presences, presences)
       |> assign(:responses_count, length(responses))
       |> assign_async(:urgent_incidents, fn ->
-        {:ok, %{urgent_incidents: Incidents.urgent_incidents(incident)}}
-        # {:error, "error"}
+        incidents_impl().urgent_incidents(incident)
       end)
 
     {:noreply, socket}
@@ -150,6 +149,7 @@ defmodule HeadsUpWeb.Incidents.Show do
     """
   end
 
+  @spec urgent_incidents(any()) :: Phoenix.LiveView.Rendered.t()
   def urgent_incidents(assigns) do
     ~H"""
     <section>
@@ -245,5 +245,9 @@ defmodule HeadsUpWeb.Incidents.Show do
       true ->
         {:noreply, stream_delete(socket, :presences, presence)}
     end
+  end
+
+  defp incidents_impl() do
+    Application.get_env(:heads_up, :incidents_impl, Incidents)
   end
 end

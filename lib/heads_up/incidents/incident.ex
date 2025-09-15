@@ -34,6 +34,7 @@ defmodule HeadsUp.Incidents.Incident do
     |> validate_length(:description, min: 10)
     |> validate_priority()
     |> assoc_constraint(:category)
+    |> assoc_constraint(:heroic_response)
   end
 
   defp validate_priority(%Ecto.Changeset{changes: %{priority: priority}} = changeset)

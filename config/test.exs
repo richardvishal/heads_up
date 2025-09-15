@@ -41,3 +41,4 @@ config :phoenix_live_view,
 
 config :heads_up, :presence_module, PhoenixPresenceMock
 config :heads_up, :pubsub_module, PhoenixPubSubMock
+config :heads_up, :incidents_impl, HeadsUp.IncidentsMock

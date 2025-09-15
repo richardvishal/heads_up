@@ -6,7 +6,10 @@ defmodule HeadsUpWeb.Incidents.Index do
   def mount(_params, _session, socket) do
     # IO.inspect(socket.assigns.streams, label: "MOUNT")
     socket =
-      assign(socket, category: Categories.category_names_and_slugs())
+      socket
+      |> assign(category: Categories.category_names_and_slugs())
+      |> assign(:show_headline?, false)
+      |> assign(:vibe, "Keep it up!")
 
     # socket =
     #   attach_hook(socket, :log_stream, :after_render, fn
@@ -31,7 +34,7 @@ defmodule HeadsUpWeb.Incidents.Index do
   def render(assigns) do
     ~H"""
     <div class="incident-index">
-      <.headline :if={false}>
+      <.headline :if={@show_headline?}>
         <.icon name="hero-trophy-mini" /> 25 Incidents Resolved This Month!
         <:tagline :let={vibe}>
           Thanks for pitching in. {vibe}
@@ -51,6 +54,10 @@ defmodule HeadsUpWeb.Incidents.Index do
         />
       </div>
     </div>
+
+    <button phx-click="show_headline" class="button mt-4">
+      Show Headline
+    </button>
     """
   end
 
@@ -113,5 +120,9 @@ defmodule HeadsUpWeb.Incidents.Index do
     socket = push_patch(socket, to: ~p"/incidents?#{params}")
 
     {:noreply, socket}
+  end
+
+  def handle_event("show_headline", _, socket) do
+    {:noreply, assign(socket, :show_headline?, true)}
   end
 end

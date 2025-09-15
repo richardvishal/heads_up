@@ -1,14 +1,19 @@
 defmodule HeadsUpWeb.ErrorHTMLTest do
-  use HeadsUpWeb.ConnCase, async: true
+  use ExUnit.Case, async: true
+  alias HeadsUpWeb.ErrorHTML
 
-  # Bring render_to_string/4 for testing custom views
-  import Phoenix.Template
+  describe "render/2" do
+    test "renders 404.html directly" do
+      assert ErrorHTML.render("404.html", %{}) == "Not Found"
+    end
 
-  test "renders 404.html" do
-    assert render_to_string(HeadsUpWeb.ErrorHTML, "404", "html", []) == "Not Found"
-  end
+    test "renders 500.html directly" do
+      assert ErrorHTML.render("500.html", %{}) == "Internal Server Error"
+    end
 
-  test "renders 500.html" do
-    assert render_to_string(HeadsUpWeb.ErrorHTML, "500", "html", []) == "Internal Server Error"
+    test "renders other error codes" do
+      assert ErrorHTML.render("401.html", %{}) == "Unauthorized"
+      assert ErrorHTML.render("403.html", %{}) == "Forbidden"
+    end
   end
 end

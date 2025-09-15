@@ -47,7 +47,7 @@ defmodule HeadsUpWeb.AdminIncidents.Index do
         </:action>
 
         <:action :let={{dom_id, incident}}>
-          <.link phx-click={delete_and_fade_out(dom_id, incident)} data-confirm="Are you sure?">
+          <.link phx-click={delete_and_fade_out(dom_id, incident)} data-confirm="Are you sure?" data-role={"delete-incident-#{incident.id}"}>
             <.icon name="hero-trash" class="h-4 w-4" /> Delete
           </.link>
         </:action>
